@@ -6,7 +6,7 @@ export default class StarRating extends HTMLElement {
     this.starCount = 5;
     this.rating = 0;
     this.lastSetRating = 0;
-    this.activeColor = "#ff0057";
+    this.activeColor = "#e70911";
     this.size = "1em";
     this.readonly = false;
   }
@@ -56,7 +56,6 @@ export default class StarRating extends HTMLElement {
     }
 
     this.render();
-    // 确保在初始化时设置了.front-stars的宽度
     this.updateStarRatingWidth();
     if (!this.readonly) this.addEventListeners();
   }
@@ -147,14 +146,17 @@ export default class StarRating extends HTMLElement {
     frontStars.style.width = `${(this.lastSetRating / this.starCount) * 100}%`;
 
     const ratingDisplay = this.shadowRoot.querySelector(".rating-display");
-    ratingDisplay.textContent = this.lastSetRating.toFixed(1);
+    if (ratingDisplay) ratingDisplay.textContent = this.lastSetRating.toFixed(1);
   }
 
   setRating(e) {
     e.stopPropagation();
     this.rating = this.lastSetRating = this.calculateRating(e);
     this.updateStarRatingWidth();
-    this.shadowRoot.querySelector(".rating-display").textContent = this.lastSetRating.toFixed(1);
+
+    const ratingDisplay = this.shadowRoot.querySelector(".rating-display");
+    if (ratingDisplay) ratingDisplay.textContent = this.lastSetRating.toFixed(1);
+
     this.dispatchEvent(new CustomEvent("rate", { detail: { rating: this.lastSetRating } }));
   }
 
@@ -162,7 +164,7 @@ export default class StarRating extends HTMLElement {
     const bounds = this.shadowRoot.querySelector(".back-stars").getBoundingClientRect();
     const x = e.clientX - bounds.left;
     const rating = (x / bounds.width) * this.starCount;
-    return Math.round(rating * 10) / 10; // 四舍五入到最接近的0.1
+    return Math.round(rating * 10) / 10; // rounding
   }
 
   updateStarRatingWidth() {
